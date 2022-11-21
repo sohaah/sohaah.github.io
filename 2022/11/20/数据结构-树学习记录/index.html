@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>年终总结2022.11.12.小雨 |  sohaah-osaa&#39;s blog</title>
+      <title>数据结构-树学习记录 |  sohaah-osaa&#39;s blog</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.png" />
@@ -53,7 +53,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-2022-11-12"
+  id="post-数据结构-树学习记录"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -64,7 +64,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  年终总结2022.11.12.小雨
+  数据结构-树学习记录
 </h1>
  
 
@@ -72,15 +72,15 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2022/11/12/2022-11-12/" class="article-date">
-  <time datetime="2022-11-12T01:48:02.000Z" itemprop="datePublished">2022-11-12</time>
+      <a href="/2022/11/20/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%91%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" class="article-date">
+  <time datetime="2022-11-20T08:01:38.000Z" itemprop="datePublished">2022-11-20</time>
 </a>   
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">1.3k</span>
+            <span class="post-count">541</span>
         </span>
     </span>
 
@@ -89,30 +89,32 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">4 min</span>
+            <span class="post-count">2 min</span>
         </span>
     </span>
 </div>
  
     </div>
       
+    <div class="tocbot"></div>
+
 
 
 
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>感觉能想起很多事，但又感觉想不出来很多事。</p>
-<span id="more"></span>
+  <h2 id="满二叉树判断"><a href="#满二叉树判断" class="headerlink" title="满二叉树判断"></a>满二叉树判断</h2><p>操作结构也相对简单，除了根节点每个节点都有两个字节点，记住数字规律就行</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">ElemType</span>&gt;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">IsFullTree</span><span class="params">(<span class="type">const</span> BinaryTree&lt;ElemType&gt; &amp;bt)</span></span></span><br><span class="line"><span class="function"><span class="comment">// 操作结果: 判断二叉树bt是否是满二叉树</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">pow</span>(<span class="number">2</span>, bt.<span class="built_in">Height</span>())<span class="number">-1</span>)==bt.<span class="built_in">NodeCount</span>();  </span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>去年一年说实话都是很迷茫的，不知道如何去做， 怎么去做更好，学校学习方面想要抓住但又感觉如果没有拿到想要的那么有什么用呢？ctf学习这边更是迷茫，付出了就一定会有收获吗？我可以得到一定的东西吗？去年的11月份开始也是我刚刚开始接触ctf，说来也是巧合，大一前的暑假就正好看到了学校信息安全实验室的贴吧招新，其实当时也非常害怕，但是又看到了萌新也可以，于是我便想着加群尝试一下，参加了实验室大一的招新比赛，很高兴的最后是第二（但其实题目都是简单的misc根本不难），之后又稀里糊涂的不知道为什么开始接触pwn方向的题目，当时开始学pwn的时候感觉太难了，又是栈有是寄存器还要看懂汇编是如何执行的加上学校大一是不学c语言的，只有硬着头皮去看，也是学的断断续续的，可能就这样迷迷糊糊的经过了一个学期了吧，不过还好到了第二学期看到学校第一学期的绩点还是能看到过去，也是正式填了分专业的表单，填了信息安全专业吧。第二学期感觉也是遇见好多好多事，第二学期来感觉也是真正的开始接触ctf开始和与实验室学长开始沟通吧（以前太自闭了），基本除了上课的话，就经常喜欢往实验室的教室跑，其实感觉也是一种虚荣的感觉居多？或者还是单纯想逃离寝室？已经分不清了，在实验室接触了很多师兄，见识了很多事情吧，就二进制方向的师兄来说，特别是messa（rabbit）师兄真的是给了我很多帮助，也见识到了josen师兄很厉害的各种神奇黑客技术，了解到e4l4和cnitlrt两个实验室竞赛比较强师兄（虽然只是我单向了解，也没啥机会说说话），也有开公司或者出去赚钱很厉害的学长，比赛方面真的是人太菜了也没有参加什么比赛，后面又有了国赛，还是坐牢看到了学长们是怎么具体参加比赛的，但感觉还是相当不错的。后面也是到了各大战队招新了，人太菜了也没有勇气和自信去投一份简历，于是就不了了之了，又是跌跌撞撞的学了一学期这样。暑假的时候也是实验室打了审核赛，那时候真的什么都不懂做不来而且又被同学拉着去当了一周的保安导致最后真的是早上7点起床晚上十点才回家也没做几个题，最后也就做了两个题一个srop打通了，还有一个是tcache struct attack真的比较失望，堆那时候都不理解是什么东西幸好网上搜了一篇例题，可惜后来本地打通了但是远程不行太可惜了（不过其他题目也是挺变态了竟然有house of banana）。后来想着不行必须buu冲一波于是布置了buu100道计划，同时暑假的时候也是去学了驾照，可惜也是由于暑假最后一个月的重感冒，硬生生的各种头晕休息和打吊针输液，也是只学到了科目二，buu100道也是定格在了96道，可惜。大二学期也是如期而至的开学了，大概第六周的时候总觉得不能再这样了，于是想着头铁一把冲了，也是投了v&amp;n战队的简历，当时也是相当紧张因为从来没有投过简历做过这些事，在面试的时候师傅们感觉也很温柔，没有特别的刁难我，再经历一个小时的面试（坐牢）之后，师傅们也是把我拉进了小群，算是第一步吧。</p>
-<p>其实零零散散的写了很多又删了很多又感觉很矫情，但最后还是决定保留下来，让以后的自己来取笑一下自己吧。经过大学学习的一年，我感觉开始逐渐清楚知道自己想要什么，逐渐清楚了很多事情我无法去改变也无法去解决，但是我想在很多偶然也存在着必然，尽我能力去做去改变也就是这样。</p>
-<p>在最后提出一些对于明年的希望和愿望吧：</p>
-<ul>
-<li>在学习方面希望能够保持热爱，并且取得一定成果吧</li>
-<li>在社交方面希望自己能够更放得开，认识更多朋友一起学习</li>
-<li>我的博客网站可以一直更新一直书写，每一年也能有个总结</li>
-</ul>
+<h2 id="完全二叉树判断"><a href="#完全二叉树判断" class="headerlink" title="完全二叉树判断"></a>完全二叉树判断</h2><p>这个判断的逻辑感觉还是比较难想有点思维，先设置一个flag位用于标记，一旦发现叶子结点的存在出现空一位或者跳跃则判断为非，同时主要运用队列的思想来判断，判断条件就是</p>
+<p>（1）当左子树叶子结点有值而当前子树的右叶子结点NULL（把flag设置为0）的时候，判断其余左子树和右子树的所有叶子结点是否存在，如存在则判断为非完全二叉树</p>
+<p>（2）当树的左子树叶子结点NULL（把flag设置为0），判断其余的左右子树所以结点是否有叶子结点存在，如何存在则判读为非完全二叉树</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">ElemType</span>&gt;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">IsCompleteTree</span><span class="params">(<span class="type">const</span> BinaryTree&lt;ElemType&gt; &amp;bt)</span></span></span><br><span class="line"><span class="function"><span class="comment">// 操作结果: 判断二叉树bt是否是完全二叉树</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LinkQueue&lt;BinTreeNode&lt;ElemType&gt;*&gt;que;</span><br><span class="line">	que.<span class="built_in">InQueue</span>((BinTreeNode&lt;ElemType&gt;*)(bt.<span class="built_in">GetRoot</span>()));</span><br><span class="line">	<span class="type">bool</span> flag = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (!que.<span class="built_in">Empty</span>())</span><br><span class="line">	&#123;</span><br><span class="line">		BinTreeNode&lt;ElemType&gt;*tmp;</span><br><span class="line">		que.<span class="built_in">OutQueue</span>(tmp);</span><br><span class="line">		<span class="keyword">if</span> (tmp-&gt;leftChild)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (!flag)<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">			que.<span class="built_in">InQueue</span>(tmp-&gt;leftChild);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			res = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">if</span> (tmp-&gt;rightChild)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (!flag)<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">			que.<span class="built_in">InQueue</span>(tmp-&gt;rightChild);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			flag = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="相似二叉树判断"><a href="#相似二叉树判断" class="headerlink" title="相似二叉树判断"></a>相似二叉树判断</h2><p>判读条件思考的难点在于找到左右子树结点时候的递归，因为情况选择的原因注意判断的时候使用否做条件</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">ElemType</span>&gt;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">IsSimilarHelp</span><span class="params">(<span class="type">const</span> BinTreeNode&lt;ElemType&gt; *bt1, <span class="type">const</span> BinTreeNode&lt;ElemType&gt; *bt2)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!bt1) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!bt2) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (!bt2) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (!<span class="built_in">IsSimilarHelp</span>(bt1-&gt;leftChild, bt2-&gt;leftChild))<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">if</span> (!<span class="built_in">IsSimilarHelp</span>(bt1-&gt;rightChild, bt2-&gt;rightChild))<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">return</span>  <span class="literal">true</span>;</span><br><span class="line">   </span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">ElemType</span>&gt;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">IsSimilar</span><span class="params">(<span class="type">const</span> BinaryTree&lt;ElemType&gt; &amp;bt1, <span class="type">const</span> BinaryTree&lt;ElemType&gt; &amp;bt2)</span></span></span><br><span class="line"><span class="function"><span class="comment">// 操作结果: 判断两棵二叉树是否相似</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">IsSimilarHelp</span>(bt1.<span class="built_in">GetRoot</span>(), bt2.<span class="built_in">GetRoot</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
  
       <!-- reward -->
       
@@ -177,12 +179,12 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2022/11/12/2022-11-12/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2022/11/20/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%91%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AD%A6%E4%B9%A0/" rel="tag">学习</a></li></ul>
 
     </footer>
   </div>
@@ -190,19 +192,10 @@
    
   <nav class="article-nav">
     
-      <a href="/2022/11/20/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%91%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            数据结构-树学习记录
-          
-        </div>
-      </a>
     
-    
-      <a href="/2022/11/11/dasctf10%E6%9C%88pwn/" class="article-nav-link">
+      <a href="/2022/11/12/2022-11-12/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">dasctf10月pwn</div>
+        <div class="article-nav-title">年终总结2022.11.12.小雨</div>
       </a>
     
   </nav>
